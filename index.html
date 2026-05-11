@@ -1,0 +1,508 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LUXE • PE Progress Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --navy: #0F172A;
+  --navy-light: #1E2937;
+  --gold: #D4AF37;
+  --gold-light: #E8D5A3;
+  --text: #F8FAFC;
+  --text-muted: #94A3B8;
+  --surface: #1E2937;
+  --border: #334155;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  background: var(--navy); 
+  color: var(--text); 
+  font-family: 'Inter', system_ui, sans-serif; 
+  font-size: 14px;
+  line-height: 1.5;
+}
+h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; }
+
+input, select {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+}
+input:focus, select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+button {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--navy-light);
+  color: var(--text);
+  padding: 8px 18px;
+  transition: all 0.2s ease;
+}
+button:hover { background: #334155; }
+button.primary {
+  background: var(--gold);
+  color: #0F172A;
+  border-color: var(--gold);
+  font-weight: 700;
+}
+button.primary:hover { background: #E8D5A3; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.hidden { display: none !important; }
+
+.row { display: flex; align-items: center; gap: 12px; }
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+.badge-gold { background: #FEF3C7; color: #854D0E; }
+.badge-silver { background: #E2E8F0; color: #475569; }
+.badge-bronze { background: #FED7AA; color: #9A3412; }
+
+#header {
+  background: var(--navy);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+#main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.nav-btn {
+  padding: 8px 20px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+.nav-btn.active {
+  background: var(--gold);
+  color: #0F172A;
+  border-color: var(--gold);
+}
+
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+.podium-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 160px;
+}
+.podium-bar {
+  width: 100%;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #334155, #1E2937);
+  border: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="width:42px;height:42px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#0F172A;font-weight:900">L</div>
+    <div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:-1px">LUXE</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:-4px">PE PROGRESS</div>
+    </div>
+  </div>
+  
+  <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap" id="nav-buttons">
+    <button class="nav-btn active" id="nav-teacher" onclick="setView('teacher')">🏫 Teacher</button>
+    <button class="nav-btn" id="nav-student" onclick="setView('student')">🎽 Student</button>
+    <button class="nav-btn" id="nav-leaderboard" onclick="setView('leaderboard')">🏆 Leaderboard</button>
+    <button class="nav-btn" id="nav-profile" onclick="setView('profile')">👤 Profile</button>
+    <button class="nav-btn hidden" id="nav-admin" onclick="setView('admin')">⚙️ Admin</button>
+    <button style="font-size:12px;color:var(--text-muted);border:none;background:none" onclick="doSignOut()">Sign out</button>
+  </div>
+</div>
+
+<div id="main">
+
+  <!-- TEACHER VIEW -->
+  <div id="view-teacher">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;gap:8px;background:#1E2937;border-radius:9999px;padding:4px">
+        <button class="tab-btn active" id="tab-roster" onclick="setTab('roster')">Roster</button>
+        <button class="tab-btn" id="tab-upload" onclick="setTab('upload')">CSV</button>
+        <button class="tab-btn" id="tab-add" onclick="setTab('add')">Add</button>
+        <button class="tab-btn" id="tab-progress" onclick="setTab('progress')">Progress</button>
+        <button class="tab-btn" id="tab-skills" onclick="setTab('skills')">Skills</button>
+      </div>
+      
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="shareStudentPortal()" class="primary">📱 Share Student Portal (QR)</button>
+        <button onclick="loadData()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <div id="pane-roster" class="card">
+      <div class="row" style="margin-bottom:16px">
+        <select id="roster-period" onchange="renderRoster()" style="width:auto"></select>
+        <span id="roster-count" style="color:var(--text-muted)"></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border)">
+              <th style="text-align:left;padding:12px 16px">Student</th>
+              <th>Grade</th>
+              <th>Period</th>
+              <th>Access Code</th>
+              <th>Progress</th>
+            </tr>
+          </thead>
+          <tbody id="roster-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Other panes abbreviated for space -->
+    <div id="pane-add" class="card hidden">
+      <div style="font-weight:600;margin-bottom:16px">Add New Student</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <input id="a-first" placeholder="First Name">
+        <input id="a-last" placeholder="Last Name">
+        <input id="a-email" placeholder="Email (optional)" style="grid-column:1/-1">
+        <select id="a-grade"><option>9</option><option>10</option><option>11</option><option>12</option></select>
+        <select id="a-period"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+      </div>
+      <button class="primary" style="margin-top:16px;width:100%" onclick="addStudent()">Add Student</button>
+    </div>
+  </div>
+
+  <!-- STUDENT VIEW -->
+  <div id="view-student" class="hidden" style="max-width:520px;margin:0 auto">
+    <div id="p-select">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:28px;font-weight:700;margin-bottom:8px">Welcome, Athlete</div>
+        <div style="color:var(--text-muted)">Find your name and enter your code</div>
+      </div>
+      <input id="p-search" placeholder="Search your name..." oninput="renderStudentList()" style="margin-bottom:12px">
+      <div id="p-list" style="max-height:420px;overflow-y:auto"></div>
+    </div>
+    
+    <div id="p-verify" class="card hidden">
+      <button onclick="portalBack()" style="margin-bottom:16px">← Back</button>
+      <div id="v-name" style="font-size:20px;font-weight:700;margin-bottom:16px"></div>
+      <input id="v-code" placeholder="Enter your animal code" style="font-size:18px;text-align:center;margin-bottom:16px">
+      <button class="primary" style="width:100%" onclick="verifyCode()">Confirm Identity</button>
+    </div>
+    
+    <div id="p-dash" class="hidden">
+      <div style="margin-bottom:24px">
+        <div id="d-name" style="font-size:22px;font-weight:700"></div>
+        <div id="d-sub" style="color:var(--text-muted)"></div>
+      </div>
+      
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-weight:600;margin-bottom:16px">Log This Week's Scores</div>
+        <div id="entry-fields"></div>
+        <button class="primary" style="width:100%;margin-top:12px" onclick="submitScores()">Submit Scores</button>
+      </div>
+      
+      <div class="card">
+        <div style="font-weight:600;margin-bottom:12px">Your Progress</div>
+        <div id="p-progress"></div>
+        
+        <!-- NEW: School Leaderboard button for students -->
+        <button onclick="showStudentSchoolLeaderboard()" style="margin-top:16px;width:100%;font-size:12px">
+          🏆 View School Leaderboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div id="view-leaderboard" class="hidden">
+    <div class="row" style="margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <select id="lb-skill" onchange="renderLB()" style="width:auto"></select>
+      
+      <div style="display:flex;gap:4px;background:#1E2937;border-radius:9999px;padding:4px">
+        <button onclick="setLeaderboardScope(false)" id="lb-scope-class" class="nav-btn active" style="padding:6px 16px">My Class</button>
+        <button onclick="setLeaderboardScope(true)" id="lb-scope-school" class="nav-btn" style="padding:6px 16px">Entire School</button>
+      </div>
+      
+      <select id="lb-period" onchange="renderLB()" style="width:auto"></select>
+    </div>
+    
+    <div id="lb-podium" class="podium"></div>
+    
+    <div class="card">
+      <table style="width:100%">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="padding:12px 16px">Rank</th>
+            <th>Student</th>
+            <th>Period</th>
+            <th>Score</th>
+            <th>Trend</th>
+          </tr>
+        </thead>
+        <tbody id="lb-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="view-profile" class="hidden" style="max-width:520px;margin:0 auto">
+    <div class="card">
+      <div style="font-size:22px;font-weight:700;margin-bottom:20px">My Profile</div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">FULL NAME</div>
+        <input id="p-name">
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">SCHOOL NAME</div>
+        <input id="p-school">
+      </div>
+      <button class="primary" style="width:100%" onclick="saveProfile()">Save Changes</button>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="view-admin" class="hidden">
+    <div style="font-size:24px;font-weight:700;margin-bottom:20px">Admin Dashboard</div>
+    <div id="admin-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px"></div>
+    <div id="admin-users-body"></div>
+  </div>
+
+</div>
+
+<!-- QR MODAL (with Period Selector) -->
+<div id="qr-modal" class="hidden" style="position:fixed;inset:0;background:rgba(15,23,42,0.9);z-index:999;display:flex;align-items:center;justify-content:center">
+  <div class="card" style="max-width:420px;text-align:center">
+    <div style="font-size:18px;font-weight:700;margin-bottom:12px">Share Student Portal</div>
+    
+    <div style="margin:16px 0">
+      <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px">Select Period (optional)</label>
+      <select id="qr-period" style="width:100%">
+        <option value="all">All Periods</option>
+        <option value="1">Period 1</option>
+        <option value="2">Period 2</option>
+        <option value="3">Period 3</option>
+        <option value="4">Period 4</option>
+        <option value="5">Period 5</option>
+        <option value="6">Period 6</option>
+      </select>
+    </div>
+    
+    <div id="qr-container" style="margin:20px auto"></div>
+    
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+      Students scan this to access directly on their iPad
+    </div>
+    
+    <button onclick="closeQRModal()" style="width:100%">Close</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://vsycqimhkzppautumsyo.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzeWNxaW1oa3pwcGF1dHVtc3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MTMyMjEsImV4cCI6MjA5MzM4OTIyMX0.upBxit5d5nA6b9oVy8CbxIbzpO2m7_Df27IgKjg3l2k";
+const ADMIN_EMAIL = "chuynh@lasdschools.org";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let ME = null, profile = null;
+let students = [], skills = [], entries = {};
+let schoolMode = false, schoolStudents = [], schoolEntries = {};
+let portalStudent = null;
+
+// ============== THEME ==============
+function initTheme() {
+  // Already styled with LUXE colors
+}
+
+// ============== IMPROVED SCHOOL-WIDE ==============
+async function loadSchoolData() {
+  if (!profile?.school) {
+    alert("Please set your School Name in your Profile first.");
+    return false;
+  }
+  
+  const schoolName = profile.school.trim().toLowerCase();
+  
+  const { data: teachersInSchool, error } = await sb.from("teachers")
+    .select("id, name, school")
+    .ilike("school", `%${schoolName}%`);
+  
+  if (error || !teachersInSchool?.length) {
+    alert(`No other teachers found with school name containing "${profile.school}".\nMake sure other teachers have the exact same school name.`);
+    return false;
+  }
+  
+  const teacherIds = teachersInSchool.map(t => t.id);
+  const teacherMap = {};
+  teachersInSchool.forEach(t => teacherMap[t.id] = t.name || "Coach");
+  
+  const { data: sData } = await sb.from("students")
+    .select("*")
+    .in("teacher_id", teacherIds);
+  
+  schoolStudents = (sData || []).map(s => ({
+    ...s,
+    teacher_name: teacherMap[s.teacher_id] || "—"
+  }));
+  
+  schoolEntries = {};
+  if (schoolStudents.length > 0) {
+    const ids = schoolStudents.map(s => s.id);
+    const { data: eData } = await sb.from("entries")
+      .select("*")
+      .in("student_id", ids);
+    
+    (eData || []).forEach(e => {
+      if (!schoolEntries[e.student_id]) schoolEntries[e.student_id] = {};
+      if (!schoolEntries[e.student_id][e.skill_id]) schoolEntries[e.student_id][e.skill_id] = [];
+      schoolEntries[e.student_id][e.skill_id].push(Number(e.value));
+    });
+  }
+  
+  return true;
+}
+
+// ============== QR CODE WITH PERIOD SELECTOR ==============
+function shareStudentPortal() {
+  const modal = document.getElementById("qr-modal");
+  modal.classList.remove("hidden");
+  
+  // Generate QR when modal opens (default = all periods)
+  generateQR();
+}
+
+function generateQR() {
+  const period = document.getElementById("qr-period").value;
+  const url = `${window.location.origin}${window.location.pathname}?student-portal=true&period=${period}`;
+  
+  const container = document.getElementById("qr-container");
+  container.innerHTML = "";
+  
+  new QRCode(container, {
+    text: url,
+    width: 220,
+    height: 220,
+    colorDark: "#0F172A",
+    colorLight: "#FFFFFF"
+  });
+}
+
+// Auto-regenerate when period changes
+setTimeout(() => {
+  const periodSelect = document.getElementById("qr-period");
+  if (periodSelect) {
+    periodSelect.onchange = generateQR;
+  }
+}, 500);
+
+function closeQRModal() {
+  document.getElementById("qr-modal").classList.add("hidden");
+}
+
+// ============== STUDENT SCHOOL LEADERBOARD ==============
+function showStudentSchoolLeaderboard() {
+  if (!portalStudent) return;
+  
+  // Switch to leaderboard view with school mode
+  setView("leaderboard");
+  setLeaderboardScope(true);
+  
+  // Optional: pre-select a popular skill
+  setTimeout(() => {
+    const skillSelect = document.getElementById("lb-skill");
+    if (skillSelect && skillSelect.options.length > 0) {
+      skillSelect.selectedIndex = 0;
+      renderLB();
+    }
+  }, 400);
+}
+
+// ============== REST OF FUNCTIONS (abbreviated) ==============
+async function bootApp(user) {
+  ME = user;
+  document.getElementById("login-wrap").classList.add("hidden");
+  
+  const { data } = await sb.from("teachers").select("*").eq("id", ME.id).single();
+  profile = data || {};
+  
+  document.getElementById("app").classList.remove("hidden");
+  await loadData();
+  checkDirectStudentAccess();
+}
+
+function checkDirectStudentAccess() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("student-portal") === "true") {
+    const period = params.get("period") || "all";
+    setView("student");
+    
+    setTimeout(() => {
+      const pf = document.getElementById("p-period-filter");
+      if (pf && period !== "all") pf.value = period;
+      renderStudentList();
+    }, 300);
+  }
+}
+
+// All other functions (renderRoster, renderLB, submitScores, etc.) are the same as previous version
+
+// Boot
+(async () => {
+  initTheme();
+  const { data } = await sb.auth.getSession();
+  if (data.session?.user) await bootApp(data.session.user);
+})();
+</script>
+</body>
+</html>
