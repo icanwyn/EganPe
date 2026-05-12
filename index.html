@@ -81,11 +81,13 @@ button.primary:hover { background: #E8D5A3; }
     <div id="view-teacher">
       <div style="display:flex;gap:4px;background:#1E2937;border-radius:9999px;padding:4px;margin-bottom:1.5rem;width:fit-content">
         <button class="tab-btn active" id="tab-roster" onclick="setTab('roster')">Roster</button>
+        <button class="tab-btn" id="tab-upload" onclick="setTab('upload')">CSV Upload</button>
         <button class="tab-btn" id="tab-add" onclick="setTab('add')">Add Student</button>
         <button class="tab-btn" id="tab-progress" onclick="setTab('progress')">Progress</button>
         <button class="tab-btn" id="tab-skills" onclick="setTab('skills')">Skills</button>
       </div>
 
+      <!-- ROSTER -->
       <div id="pane-roster" class="card">
         <div class="row" style="margin-bottom:16px">
           <select id="roster-period" onchange="renderRoster()" style="width:auto"></select>
@@ -99,6 +101,22 @@ button.primary:hover { background: #E8D5A3; }
         </div>
       </div>
 
+      <!-- CSV UPLOAD -->
+      <div id="pane-upload" class="card hidden">
+        <div style="font-weight:600;margin-bottom:12px">Upload CSV Roster</div>
+        <button onclick="dlTemplate()" style="margin-bottom:12px">Download Template</button>
+        <input type="file" id="csv-file" accept=".csv" onchange="readCSV(this)" style="margin-bottom:12px"/>
+        <div id="csv-preview" class="hidden">
+          <div class="row" style="margin-bottom:12px">
+            <span id="csv-count" style="font-weight:500"></span>
+            <button class="primary" onclick="importCSV()">Import</button>
+            <button onclick="cancelCSV()">Cancel</button>
+          </div>
+          <div id="csv-list" style="max-height:200px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- ADD STUDENT -->
       <div id="pane-add" class="card hidden">
         <div style="font-weight:600;margin-bottom:16px">Add New Student</div>
         <div class="grid2">
@@ -111,6 +129,7 @@ button.primary:hover { background: #E8D5A3; }
         <button class="primary" style="margin-top:16px;width:100%" onclick="addStudent()">Add Student</button>
       </div>
 
+      <!-- PROGRESS -->
       <div id="pane-progress" class="card hidden">
         <div class="row" style="margin-bottom:12px">
           <select id="prog-skill" onchange="renderProgress()" style="width:auto"></select>
@@ -119,9 +138,30 @@ button.primary:hover { background: #E8D5A3; }
         <div id="prog-body"></div>
       </div>
 
+      <!-- SKILLS -->
       <div id="pane-skills" class="card hidden">
-        <div style="font-weight:600;margin-bottom:12px">Manage Skills</div>
-        <div id="skills-list"></div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          
+          <!-- Current Skills -->
+          <div style="flex:1;min-width:280px">
+            <div style="font-weight:600;margin-bottom:12px">Current Skills</div>
+            <div id="skills-list"></div>
+          </div>
+
+          <!-- Add New Skill -->
+          <div style="flex:1;min-width:280px">
+            <div style="font-weight:600;margin-bottom:12px">Add New Skill</div>
+            <input id="sk-name" placeholder="Skill Name (e.g. Vertical Jump)" style="margin-bottom:10px"/>
+            <input id="sk-unit" placeholder="Unit (e.g. inches, sec, reps)" style="margin-bottom:10px"/>
+            <div style="margin-bottom:12px">
+              <label style="font-size:12px;color:var(--text-muted)">Scoring Direction</label><br>
+              <button id="sk-dir-high" onclick="setSkDir(false)" class="primary" style="margin-right:8px">↑ Higher = Better</button>
+              <button id="sk-dir-low" onclick="setSkDir(true)">↓ Lower = Better</button>
+            </div>
+            <button class="primary" style="width:100%" onclick="addSkill()">Add Skill</button>
+            <div id="new-skill-alert" style="margin-top:10px"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -216,6 +256,8 @@ let students = [], skills = [], entries = {};
 let schoolMode = false, schoolStudents = [], schoolEntries = {};
 let portalStudent = null;
 let isSignup = false;
+let csvRows = [];
+let skLowerBetter = false;
 
 function toggleMode() {
   isSignup = !isSignup;
@@ -297,7 +339,7 @@ async function loadData() {
       entries[e.student_id][e.skill_id].push(Number(e.value));
     });
   }
-  syncFilters(); renderRoster(); renderProgress(); renderLB(); renderStudentList();
+  syncFilters(); renderRoster(); renderProgress(); renderLB(); renderStudentList(); renderSkillsList();
 }
 
 function syncFilters() {
@@ -461,7 +503,7 @@ function setView(v) {
 }
 
 function setTab(t) {
-  ["roster","add","progress","skills"].forEach(id => {
+  ["roster","upload","add","progress","skills"].forEach(id => {
     const pane = document.getElementById(`pane-${id}`);
     const tab = document.getElementById(`tab-${id}`);
     if (pane) pane.classList.toggle("hidden", id !== t);
@@ -473,7 +515,88 @@ function setTab(t) {
 
 function renderSkillsList() {
   const el = document.getElementById("skills-list"); if (!el) return;
-  el.innerHTML = skills.map(sk => `<div class="row" style="padding:10px 12px;background:#1E2937;border-radius:8px;margin-bottom:8px"><div style="flex:1"><div style="font-weight:500">${sk.name}</div><div style="font-size:11px;color:var(--text-muted)">${sk.unit} • ${sk.lower_better ? "Lower is better" : "Higher is better"}</div></div></div>`).join("");
+  el.innerHTML = skills.map(sk => `
+    <div class="row" style="padding:10px 12px;background:#1E2937;border-radius:8px;margin-bottom:8px">
+      <div style="flex:1">
+        <div style="font-weight:500">${sk.name}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${sk.unit} • ${sk.lower_better ? "Lower is better" : "Higher is better"}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function setSkDir(lb) {
+  skLowerBetter = lb;
+  document.getElementById("sk-dir-high").className = lb ? "" : "primary";
+  document.getElementById("sk-dir-low").className = lb ? "primary" : "";
+}
+
+async function addSkill() {
+  const name = document.getElementById("sk-name").value.trim();
+  const unit = document.getElementById("sk-unit").value.trim();
+  document.getElementById("new-skill-alert").innerHTML = "";
+  if (!name || !unit) { document.getElementById("new-skill-alert").innerHTML = `<div style="color:#FCA5A5">Name and unit are required.</div>`; return; }
+  const { error } = await sb.from("skills").insert([{ teacher_id: ME.id, name, unit, lower_better: skLowerBetter }]);
+  if (error) { document.getElementById("new-skill-alert").innerHTML = `<div style="color:#FCA5A5">${error.message}</div>`; return; }
+  document.getElementById("sk-name").value = "";
+  document.getElementById("sk-unit").value = "";
+  document.getElementById("new-skill-alert").innerHTML = `<div style="color:#86EFAC">Skill added!</div>`;
+  setTimeout(() => document.getElementById("new-skill-alert").innerHTML = "", 2000);
+  await loadData();
+}
+
+function dlTemplate() {
+  const csv = "first,last,grade,gender,email,period\nAlex,Johnson,9,M,alex@school.edu,1\nMaya,Rodriguez,9,F,maya@school.edu,2";
+  const a = document.createElement("a");
+  a.href = "data:text/csv," + encodeURIComponent(csv);
+  a.download = "roster_template.csv";
+  a.click();
+}
+
+function readCSV(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.trim().split(/\r?\n/);
+    const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const miss = ["first","last","grade","gender","email","period"].filter(n => !headers.includes(n));
+    if (miss.length) { alert("Missing columns: " + miss.join(", ")); return; }
+    csvRows = lines.slice(1).filter(l => l.trim()).map(l => {
+      const cols = l.split(",").map(c => c.trim());
+      const row = {}; headers.forEach((h,i) => row[h] = cols[i] || "");
+      const grade = parseInt(row.grade) || 9;
+      return { first: row.first, last: row.last, grade, period: parseInt(row.period) || 1, gender: (row.gender || "M").toUpperCase(), email: row.email || null, access_code: makeCode(row.first, row.last, grade), teacher_id: ME.id };
+    });
+    document.getElementById("csv-count").textContent = `${csvRows.length} students ready`;
+    document.getElementById("csv-list").innerHTML = csvRows.map(s => `<div class="row" style="padding:8px 12px;background:#1E2937;border-radius:6px;margin-bottom:6px">${s.first} ${s.last} (Gr ${s.grade}, P${s.period})</div>`).join("");
+    document.getElementById("csv-preview").classList.remove("hidden");
+  };
+  reader.readAsText(file);
+}
+
+async function importCSV() {
+  let ok = 0, skip = 0, fail = 0;
+  for (const s of csvRows) {
+    const { error } = await sb.from("students").insert([s]);
+    if (error) { if (error.code === "23505") skip++; else fail++; }
+    else ok++;
+  }
+  await loadData();
+  cancelCSV();
+  alert(`${ok} imported, ${skip} skipped, ${fail} failed`);
+}
+
+function cancelCSV() {
+  csvRows = [];
+  document.getElementById("csv-preview").classList.add("hidden");
+  document.getElementById("csv-file").value = "";
+}
+
+function makeCode(f, l, g) {
+  const animals = ["Fox","Bear","Wolf","Hawk","Lion","Deer","Owl","Panda","Tiger","Eagle"];
+  const a = animals[(f.charCodeAt(0) + l.charCodeAt(0)) % animals.length];
+  const n = ((g * 13 + f.length * 7) % 90) + 10;
+  return `${a}${n}`;
 }
 
 async function loadAdmin() {
