@@ -10,56 +10,42 @@
 <style>
 :root { --navy: #0F172A; --navy-light: #1E2937; --gold: #D4AF37; --gold-light: #E8D5A3; --text: #F8FAFC; --text-muted: #94A3B8; --surface: #1E2937; --border: #334155; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--navy); color: var(--text); font-family: 'Inter', system_ui, sans-serif; font-size: 14px; line-height: 1.5; }
-input, select { font-family: inherit; font-size: 14px; color: var(--text); background: var(--navy-light); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; outline: none; width: 100%; }
-input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
-button { font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); border-radius: 9999px; background: var(--navy-light); color: var(--text); padding: 8px 18px; transition: all 0.2s ease; }
-button:hover { background: #334155; }
+body { background: var(--navy); color: var(--text); font-family: 'Inter', system_ui, sans-serif; font-size: 14px; }
+input, select { font-family: inherit; font-size: 14px; color: var(--text); background: var(--navy-light); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; width: 100%; }
+button { font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); border-radius: 9999px; background: var(--navy-light); color: var(--text); padding: 8px 18px; }
 button.primary { background: var(--gold); color: #0F172A; border-color: var(--gold); font-weight: 700; }
-button.primary:hover { background: #E8D5A3; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; }
 .hidden { display: none !important; }
 .row { display: flex; align-items: center; gap: 12px; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 9999px; white-space: nowrap; }
-.badge-gold { background: #FEF3C7; color: #854D0E; }
-.badge-silver { background: #E2E8F0; color: #475569; }
-.badge-bronze { background: #FED7AA; color: #9A3412; }
-#header { background: var(--navy); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; }
-#main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
-.nav-btn { padding: 8px 20px; border-radius: 9999px; font-size: 13px; font-weight: 600; border: 1px solid var(--border); }
-.nav-btn.active { background: var(--gold); color: #0F172A; border-color: var(--gold); }
-.tab-btn { padding: 8px 18px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; border-radius: 8px; }
-.tab-btn.active { background: var(--navy-light); color: var(--gold); }
 </style>
 </head>
 <body>
 
-<div id="header">
+<div id="header" style="background:#0F172A;border-bottom:1px solid #334155;padding:1rem 2rem;display:flex;align-items:center;gap:16px">
   <div style="display:flex;align-items:center;gap:12px">
-    <div style="width:42px;height:42px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#0F172A;font-weight:900">L</div>
+    <div style="width:42px;height:42px;background:#D4AF37;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#0F172A;font-weight:900">L</div>
     <div>
-      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:-1px">LUXE</div>
-      <div style="font-size:10px;color:var(--text-muted);margin-top:-4px">PE PROGRESS</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700">LUXE</div>
+      <div style="font-size:10px;color:#94A3B8;margin-top:-4px">PE PROGRESS</div>
     </div>
   </div>
-  <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+  <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
     <button class="nav-btn active" id="nav-teacher" onclick="setView('teacher')">🏫 Teacher</button>
     <button class="nav-btn" id="nav-student" onclick="setView('student')">🎽 Student</button>
     <button class="nav-btn" id="nav-leaderboard" onclick="setView('leaderboard')">🏆 Leaderboard</button>
     <button class="nav-btn" id="nav-profile" onclick="setView('profile')">👤 Profile</button>
     <button class="nav-btn hidden" id="nav-admin" onclick="setView('admin')">⚙️ Admin</button>
-    <button style="font-size:12px;color:var(--text-muted);border:none;background:none" onclick="doSignOut()">Sign out</button>
+    <button style="font-size:12px;color:#94A3B8;border:none;background:none" onclick="doSignOut()">Sign out</button>
   </div>
 </div>
 
-<div id="main">
+<div id="main" style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem">
 
   <!-- LOGIN -->
   <div id="login-wrap">
     <div class="card" style="max-width:420px;margin:40px auto">
       <div style="text-align:center;margin-bottom:24px">
-        <div style="width:64px;height:64px;background:var(--gold);border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#0F172A;font-weight:900">L</div>
+        <div style="width:64px;height:64px;background:#D4AF37;border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#0F172A;font-weight:900">L</div>
         <div style="font-size:24px;font-weight:700">Welcome to LUXE</div>
       </div>
       <div id="login-alert"></div>
@@ -70,7 +56,7 @@ button.primary:hover { background: #E8D5A3; }
       <input id="l-email" type="email" placeholder="Email" style="margin-bottom:12px"/>
       <input id="l-pass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doAuth()" style="margin-bottom:16px"/>
       <button class="primary" style="width:100%;padding:12px" onclick="doAuth()" id="auth-btn">Sign In</button>
-      <button style="width:100%;margin-top:12px;border:none;background:none;color:var(--text-muted);font-size:13px" onclick="toggleMode()" id="mode-btn">New teacher? Create account</button>
+      <button style="width:100%;margin-top:12px;border:none;background:none;color:#94A3B8;font-size:13px" onclick="toggleMode()" id="mode-btn">New teacher? Create account</button>
     </div>
   </div>
 
@@ -89,13 +75,13 @@ button.primary:hover { background: #E8D5A3; }
 
       <!-- ROSTER -->
       <div id="pane-roster" class="card">
-        <div class="row" style="margin-bottom:16px">
+        <div style="margin-bottom:16px">
           <select id="roster-period" onchange="renderRoster()" style="width:auto"></select>
-          <span id="roster-count" style="color:var(--text-muted)"></span>
+          <span id="roster-count" style="color:#94A3B8;margin-left:12px"></span>
         </div>
         <div style="overflow-x:auto">
           <table style="width:100%">
-            <thead><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:12px 16px">Student</th><th>Grade</th><th>Period</th><th>Access Code</th><th>Progress</th></tr></thead>
+            <thead><tr style="border-bottom:1px solid #334155"><th style="text-align:left;padding:12px 16px">Student</th><th>Grade</th><th>Period</th><th>Access Code</th><th>Progress</th></tr></thead>
             <tbody id="roster-body"></tbody>
           </table>
         </div>
@@ -103,11 +89,11 @@ button.primary:hover { background: #E8D5A3; }
 
       <!-- CSV UPLOAD -->
       <div id="pane-upload" class="card hidden">
-        <div style="font-weight:600;margin-bottom:12px">Upload CSV Roster</div>
+        <div style="font-weight:600;margin-bottom:16px">Upload CSV Roster</div>
         <button onclick="dlTemplate()" style="margin-bottom:12px">Download Template</button>
         <input type="file" id="csv-file" accept=".csv" onchange="readCSV(this)" style="margin-bottom:12px"/>
         <div id="csv-preview" class="hidden">
-          <div class="row" style="margin-bottom:12px">
+          <div style="margin-bottom:12px">
             <span id="csv-count" style="font-weight:500"></span>
             <button class="primary" onclick="importCSV()">Import</button>
             <button onclick="cancelCSV()">Cancel</button>
@@ -119,7 +105,7 @@ button.primary:hover { background: #E8D5A3; }
       <!-- ADD STUDENT -->
       <div id="pane-add" class="card hidden">
         <div style="font-weight:600;margin-bottom:16px">Add New Student</div>
-        <div class="grid2">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <input id="a-first" placeholder="First Name">
           <input id="a-last" placeholder="Last Name">
           <input id="a-email" placeholder="Email (optional)" style="grid-column:1/-1">
@@ -131,7 +117,7 @@ button.primary:hover { background: #E8D5A3; }
 
       <!-- PROGRESS -->
       <div id="pane-progress" class="card hidden">
-        <div class="row" style="margin-bottom:12px">
+        <div style="display:flex;gap:12px;margin-bottom:12px">
           <select id="prog-skill" onchange="renderProgress()" style="width:auto"></select>
           <select id="prog-period" onchange="renderProgress()" style="width:auto"></select>
         </div>
@@ -140,21 +126,21 @@ button.primary:hover { background: #E8D5A3; }
 
       <!-- SKILLS -->
       <div id="pane-skills" class="card hidden">
-        <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <div style="display:flex;gap:30px;flex-wrap:wrap">
           
           <!-- Current Skills -->
-          <div style="flex:1;min-width:280px">
+          <div style="flex:1;min-width:300px">
             <div style="font-weight:600;margin-bottom:12px">Current Skills</div>
             <div id="skills-list"></div>
           </div>
 
           <!-- Add New Skill -->
-          <div style="flex:1;min-width:280px">
+          <div style="flex:1;min-width:300px">
             <div style="font-weight:600;margin-bottom:12px">Add New Skill</div>
             <input id="sk-name" placeholder="Skill Name (e.g. Vertical Jump)" style="margin-bottom:10px"/>
             <input id="sk-unit" placeholder="Unit (e.g. inches, sec, reps)" style="margin-bottom:10px"/>
             <div style="margin-bottom:12px">
-              <label style="font-size:12px;color:var(--text-muted)">Scoring Direction</label><br>
+              <label style="font-size:12px;color:#94A3B8">Scoring Direction</label><br>
               <button id="sk-dir-high" onclick="setSkDir(false)" class="primary" style="margin-right:8px">↑ Higher = Better</button>
               <button id="sk-dir-low" onclick="setSkDir(true)">↓ Lower = Better</button>
             </div>
@@ -185,7 +171,7 @@ button.primary:hover { background: #E8D5A3; }
       <div id="p-dash" class="hidden">
         <div style="margin-bottom:24px">
           <div id="d-name" style="font-size:22px;font-weight:700"></div>
-          <div id="d-sub" style="color:var(--text-muted)"></div>
+          <div id="d-sub" style="color:#94A3B8"></div>
         </div>
         <div class="card" style="margin-bottom:16px">
           <div style="font-weight:600;margin-bottom:16px">Log This Week's Scores</div>
@@ -201,7 +187,7 @@ button.primary:hover { background: #E8D5A3; }
 
     <!-- LEADERBOARD -->
     <div id="view-leaderboard" class="hidden">
-      <div class="row" style="margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
         <select id="lb-skill" onchange="renderLB()" style="width:auto"></select>
         <div style="display:flex;gap:4px;background:#1E2937;border-radius:9999px;padding:4px">
           <button onclick="setLeaderboardScope(false)" id="lb-scope-class" class="nav-btn active" style="padding:6px 16px">My Class</button>
@@ -209,10 +195,10 @@ button.primary:hover { background: #E8D5A3; }
         </div>
         <select id="lb-period" onchange="renderLB()" style="width:auto"></select>
       </div>
-      <div id="lb-podium" class="podium"></div>
+      <div id="lb-podium" style="display:flex;align-items:flex-end;justify-content:center;gap:12px;margin-bottom:2rem"></div>
       <div class="card">
         <table style="width:100%">
-          <thead><tr style="border-bottom:1px solid var(--border)"><th style="padding:12px 16px">Rank</th><th>Student</th><th>Period</th><th>Score</th><th>Trend</th></tr></thead>
+          <thead><tr style="border-bottom:1px solid #334155"><th style="padding:12px 16px">Rank</th><th>Student</th><th>Period</th><th>Score</th><th>Trend</th></tr></thead>
           <tbody id="lb-body"></tbody>
         </table>
       </div>
@@ -223,11 +209,11 @@ button.primary:hover { background: #E8D5A3; }
       <div class="card">
         <div style="font-size:22px;font-weight:700;margin-bottom:20px">My Profile</div>
         <div style="margin-bottom:16px">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">FULL NAME</div>
+          <div style="font-size:12px;color:#94A3B8;margin-bottom:6px">FULL NAME</div>
           <input id="p-name">
         </div>
         <div style="margin-bottom:16px">
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">SCHOOL NAME</div>
+          <div style="font-size:12px;color:#94A3B8;margin-bottom:6px">SCHOOL NAME</div>
           <input id="p-school">
         </div>
         <button class="primary" style="width:100%" onclick="saveProfile()">Save Changes</button>
@@ -365,11 +351,11 @@ function renderRoster() {
   const list = period === "all" ? students : students.filter(s => s.period === +period);
   document.getElementById("roster-count").textContent = `${list.length} students`;
   const tb = document.getElementById("roster-body");
-  if (!list.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem">No students yet.</td></tr>`; return; }
+  if (!list.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94A3B8;padding:2rem">No students yet.</td></tr>`; return; }
   tb.innerHTML = list.map(s => {
     const logged = skills.filter(sk => (entries[s.id]?.[sk.id] || []).length > 0).length;
     const pct = skills.length ? Math.round((logged / skills.length) * 100) : 0;
-    return `<tr><td style="padding:12px 16px"><strong>${s.first} ${s.last}</strong></td><td style="text-align:center">${s.grade}</td><td style="text-align:center">P${s.period}</td><td><span class="badge badge-silver" style="font-family:monospace">${s.access_code}</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="height:6px;width:80px;background:#334155;border-radius:99px"><div style="height:6px;width:${pct}%;background:var(--gold);border-radius:99px"></div></div><span style="font-size:11px">${logged}/${skills.length}</span></div></td></tr>`;
+    return `<tr><td style="padding:12px 16px"><strong>${s.first} ${s.last}</strong></td><td style="text-align:center">${s.grade}</td><td style="text-align:center">P${s.period}</td><td><span class="badge badge-silver" style="font-family:monospace">${s.access_code}</span></td><td><div style="display:flex;align-items:center;gap:8px"><div style="height:6px;width:80px;background:#334155;border-radius:99px"><div style="height:6px;width:${pct}%;background:#D4AF37;border-radius:99px"></div></div><span style="font-size:11px">${logged}/${skills.length}</span></div></td></tr>`;
   }).join("");
 }
 
@@ -379,11 +365,11 @@ function renderProgress() {
   const sk = skills.find(s => s.id === skid);
   const list = period === "all" ? students : students.filter(s => s.period === +period);
   const container = document.getElementById("prog-body");
-  if (!list.length || !sk) { container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:2rem">No data yet.</div>`; return; }
+  if (!list.length || !sk) { container.innerHTML = `<div style="text-align:center;color:#94A3B8;padding:2rem">No data yet.</div>`; return; }
   container.innerHTML = list.map(s => {
     const vals = entries[s.id]?.[skid] || [];
     const last = vals.length ? vals[vals.length-1] : "—";
-    return `<div class="row" style="padding:12px 0;border-bottom:1px solid var(--border)"><div style="flex:1"><strong>${s.first} ${s.last}</strong></div><div style="width:120px;text-align:right">${last} ${sk.unit}</div></div>`;
+    return `<div class="row" style="padding:12px 0;border-bottom:1px solid #334155"><div style="flex:1"><strong>${s.first} ${s.last}</strong></div><div style="width:120px;text-align:right">${last} ${sk.unit}</div></div>`;
   }).join("");
 }
 
@@ -396,11 +382,11 @@ function renderLB() {
   const ranked = filtered.map(s => ({ ...s, val: (schoolMode ? schoolEntries : entries)[s.id]?.[skid]?.slice(-1)[0] || null })).filter(s => s.val !== null).sort((a,b) => sk?.lower_better ? a.val - b.val : b.val - a.val);
   const pod = document.getElementById("lb-podium");
   if (pod && ranked.length >= 3) {
-    pod.innerHTML = ranked.slice(0,3).map((s,i) => { const r = i === 0 ? 1 : i === 1 ? 2 : 3; return `<div class="podium-col"><div style="font-weight:700">${s.first}</div><div style="font-size:12px;color:var(--text-muted)">${s.val} ${sk?.unit}</div><div class="badge badge-${r===1?'gold':r===2?'silver':'bronze'}">#${r}</div></div>`; }).join("");
+    pod.innerHTML = ranked.slice(0,3).map((s,i) => { const r = i === 0 ? 1 : i === 1 ? 2 : 3; return `<div class="podium-col"><div style="font-weight:700">${s.first}</div><div style="font-size:12px;color:#94A3B8">${s.val} ${sk?.unit}</div><div class="badge badge-${r===1?'gold':r===2?'silver':'bronze'}">#${r}</div></div>`; }).join("");
   } else if (pod) pod.innerHTML = "";
   const tb = document.getElementById("lb-body");
   if (!tb) return;
-  if (!ranked.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem">No scores yet.</td></tr>`; return; }
+  if (!ranked.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#94A3B8;padding:2rem">No scores yet.</td></tr>`; return; }
   tb.innerHTML = ranked.map((s,i) => `<tr><td style="padding:12px 16px">#${i+1}</td><td><strong>${s.first} ${s.last}</strong></td><td>P${s.period}</td><td><strong>${s.val} ${sk?.unit}</strong></td><td>—</td></tr>`).join("");
 }
 
@@ -433,8 +419,8 @@ function renderStudentList() {
   const el = document.getElementById("p-list"); if (!el) return;
   const search = (document.getElementById("p-search")?.value || "").toLowerCase().trim();
   let list = students.filter(s => !search || s.first.toLowerCase().includes(search) || s.last.toLowerCase().includes(search));
-  if (!list.length) { el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-muted)">No students found.</div>`; return; }
-  el.innerHTML = list.map(s => `<button onclick="pickStudent('${s.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;text-align:left;border-radius:10px;width:100%;border:1px solid var(--border);margin-bottom:6px;background:var(--navy-light)"><div style="width:42px;height:42px;background:#334155;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600">${s.first[0]}${s.last[0]}</div><div style="flex:1;text-align:left"><div style="font-weight:500">${s.first} ${s.last}</div><div style="font-size:12px;color:var(--text-muted)">Grade ${s.grade} · Period ${s.period}</div></div></button>`).join("");
+  if (!list.length) { el.innerHTML = `<div style="text-align:center;padding:2rem;color:#94A3B8">No students found.</div>`; return; }
+  el.innerHTML = list.map(s => `<button onclick="pickStudent('${s.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;text-align:left;border-radius:10px;width:100%;border:1px solid #334155;margin-bottom:6px;background:#1E2937"><div style="width:42px;height:42px;background:#334155;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600">${s.first[0]}${s.last[0]}</div><div style="flex:1;text-align:left"><div style="font-weight:500">${s.first} ${s.last}</div><div style="font-size:12px;color:#94A3B8">Grade ${s.grade} · Period ${s.period}</div></div></button>`).join("");
 }
 
 function pickStudent(id) {
@@ -459,8 +445,8 @@ function verifyCode() {
 function renderStudentDash() {
   document.getElementById("d-name").textContent = `${portalStudent.first} ${portalStudent.last}`;
   document.getElementById("d-sub").textContent = `Grade ${portalStudent.grade} · Period ${portalStudent.period}`;
-  document.getElementById("entry-fields").innerHTML = skills.map(sk => `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><label style="font-size:13px;font-weight:500">${sk.name}</label><span style="font-size:12px;color:var(--text-muted)">${sk.unit}</span></div><input type="number" step="0.1" placeholder="Enter ${sk.unit}..." id="ef-${sk.id}"/></div>`).join("");
-  document.getElementById("p-progress").innerHTML = skills.map(sk => { const vals = entries[portalStudent.id]?.[sk.id] || []; const last = vals.length ? vals[vals.length-1] : "No entries"; return `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)"><div style="font-weight:500">${sk.name}</div><div style="font-size:12px;color:var(--text-muted)">Latest: ${last} ${sk.unit}</div></div>`; }).join("");
+  document.getElementById("entry-fields").innerHTML = skills.map(sk => `<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><label style="font-size:13px;font-weight:500">${sk.name}</label><span style="font-size:12px;color:#94A3B8">${sk.unit}</span></div><input type="number" step="0.1" placeholder="Enter ${sk.unit}..." id="ef-${sk.id}"/></div>`).join("");
+  document.getElementById("p-progress").innerHTML = skills.map(sk => { const vals = entries[portalStudent.id]?.[sk.id] || []; const last = vals.length ? vals[vals.length-1] : "No entries"; return `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #334155"><div style="font-weight:500">${sk.name}</div><div style="font-size:12px;color:#94A3B8">Latest: ${last} ${sk.unit}</div></div>`; }).join("");
 }
 
 async function submitScores() {
@@ -519,7 +505,7 @@ function renderSkillsList() {
     <div class="row" style="padding:10px 12px;background:#1E2937;border-radius:8px;margin-bottom:8px">
       <div style="flex:1">
         <div style="font-weight:500">${sk.name}</div>
-        <div style="font-size:11px;color:var(--text-muted)">${sk.unit} • ${sk.lower_better ? "Lower is better" : "Higher is better"}</div>
+        <div style="font-size:11px;color:#94A3B8">${sk.unit} • ${sk.lower_better ? "Lower is better" : "Higher is better"}</div>
       </div>
     </div>
   `).join("");
@@ -604,7 +590,7 @@ async function loadAdmin() {
   const { data: teachers } = await sb.from("teachers").select("*").order("created_at", { ascending: false });
   document.getElementById("admin-stats").innerHTML = `<div class="card"><div style="font-size:22px">👩‍🏫</div><div class="stat-num">${teachers?.length || 0}</div><div class="stat-label">Total Teachers</div></div><div class="card"><div style="font-size:22px">🎽</div><div class="stat-num">${students.length}</div><div class="stat-label">Total Students</div></div>`;
   const tb = document.getElementById("admin-users-body");
-  tb.innerHTML = (teachers || []).map(t => `<div class="card" style="margin-bottom:8px"><div class="row"><div style="flex:1"><div style="font-weight:600">${t.name || t.email}</div><div style="font-size:12px;color:var(--text-muted)">${t.school || "No school"}</div></div><div style="font-size:12px;color:var(--text-muted)">${new Date(t.created_at).toLocaleDateString()}</div></div></div>`).join("");
+  tb.innerHTML = (teachers || []).map(t => `<div class="card" style="margin-bottom:8px"><div class="row"><div style="flex:1"><div style="font-weight:600">${t.name || t.email}</div><div style="font-size:12px;color:#94A3B8">${t.school || "No school"}</div></div><div style="font-size:12px;color:#94A3B8">${new Date(t.created_at).toLocaleDateString()}</div></div></div>`).join("");
 }
 
 (async () => {
